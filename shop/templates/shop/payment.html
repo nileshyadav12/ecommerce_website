@@ -1,0 +1,24 @@
+<!-- shop/payment.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment</title>
+</head>
+<body>
+    <h1>Payment</h1>
+    <p>Order ID: {{ order.id }}</p>
+    <p>Amount to Pay: ${{ order.total_price }}</p>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="payment_method">Payment Method:</label>
+        <select name="payment_method">
+            <option value="Credit Card">Credit Card</option>
+            <option value="EMI">EMI</option>
+        </select><br>
+
+        <button type="submit">Make Payment</button>
+    </form>
+</body>
+</html>

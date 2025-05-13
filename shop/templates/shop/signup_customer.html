@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Signup</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #f1f3f6, #e3e9f1);
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            margin: 40px auto;
+            background: #ffffff;
+            padding: 35px 30px;
+            border-radius: 10px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        h2 {
+            text-align: center;
+            color: #2874f0;
+            font-size: 26px;
+            margin-bottom: 20px;
+        }
+
+        form p {
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        form label {
+            font-weight: 500;
+            color: #333;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        form input {
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            transition: border-color 0.3s ease;
+        }
+
+        form input:focus {
+            border-color: #2874f0;
+            outline: none;
+        }
+
+        .password-toggle {
+            position: absolute;
+            top: 35px;
+            right: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .btn {
+            background: #fb641b;
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            margin-top: 15px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #d85a17;
+        }
+
+        .message {
+            color: green;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .back {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .back a {
+            color: #2874f0;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .back a:hover {
+            text-decoration: underline;
+            color: #0f53c5;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 500px) {
+            .container {
+                padding: 25px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Create Your Customer Account</h2>
+
+    {% if messages %}
+        <div class="message">
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            <p>
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.name == "password1" or field.name == "password2" %}
+                    <span class="password-toggle" onclick="togglePassword('{{ field.id_for_label }}')">👁️</span>
+                {% endif %}
+                {% for error in field.errors %}
+                    <span style="color: red; font-size: 13px;">{{ error }}</span>
+                {% endfor %}
+            </p>
+        {% endfor %}
+        <button class="btn" type="submit">Sign Up</button>
+    </form>
+
+    <div class="back">
+        <a href="{% url 'customer_login' %}">Already have an account? Login</a>
+    </div>
+</div>
+
+<script>
+    function togglePassword(fieldId) {
+        const input = document.getElementById(fieldId);
+        if (input.type === "password") {
+            input.type = "text";
+        } else {
+            input.type = "password";
+        }
+    }
+</script>
+</body>
+</html>

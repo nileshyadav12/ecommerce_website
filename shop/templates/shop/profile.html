@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <style>
+        :root {
+            --bg-color: #f4f4f9;
+            --container-bg: #ffffff;
+            --text-color: #333;
+            --primary: #007BFF;
+            --danger: #dc3545;
+            --success: #28a745;
+            --info: #17a2b8;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --border-color: #ddd;
+        }
+
+        body.dark-mode {
+            --bg-color: #121212;
+            --container-bg: #1f1f1f;
+            --text-color: #f1f1f1;
+            --primary: #339af0;
+            --danger: #ff6b6b;
+            --success: #51cf66;
+            --info: #38d9a9;
+            --shadow: rgba(255, 255, 255, 0.05);
+            --border-color: #444;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            background-color: var(--container-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px var(--shadow);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary);
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+
+        .profile-header img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+        }
+
+        .profile-header h2 {
+            color: var(--text-color);
+            font-size: 24px;
+        }
+
+        .profile-header button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .profile-header button:hover {
+            background-color: #0056b3;
+        }
+
+        .order-section {
+            margin-top: 30px;
+        }
+
+        .order-card {
+            background-color: var(--container-bg);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px var(--shadow);
+        }
+
+        .order-card h3 {
+            margin: 0;
+            font-size: 22px;
+            color: var(--primary);
+        }
+
+        .order-card p {
+            margin: 5px 0;
+        }
+
+        .order-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .order-card ul li {
+            margin: 5px 0;
+            color: var(--text-color);
+        }
+
+        .toggle-container {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .toggle-btn {
+            background: none;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .toggle-btn:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .profile-header h2 {
+                font-size: 20px;
+            }
+
+            .order-card {
+                padding: 15px;
+            }
+
+            .order-card h3 {
+                font-size: 18px;
+            }
+
+            .profile-header button {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- Theme Toggle Button -->
+        <div class="toggle-container">
+            <button class="toggle-btn" onclick="toggleTheme()">Toggle Theme</button>
+        </div>
+
+        <!-- Profile Header Section -->
+        <div class="profile-header">
+            <div>
+                <img src="{{ user.profile_picture_url }}" alt="Profile Picture" />
+                <h2>Welcome, {{ user.username }}!</h2>
+            </div>
+            <button>Edit Profile</button>
+        </div>
+
+        <!-- Orders Section -->
+        <div class="order-section">
+            <h2>Your Orders</h2>
+
+            {% for order in orders %}
+                <div class="order-card">
+                    <h3>Order #{{ order.id }}</h3>
+                    <p><strong>Total Price:</strong> ${{ order.total_price }}</p>
+                    <p><strong>Shipping Address:</strong> {{ order.shipping_address }}</p>
+                    <ul>
+                        {% for item in order.order_items.all %}
+                            <li>{{ item.product.name }} (x{{ item.quantity }}) - ${{ item.price * item.quantity }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% empty %}
+                <p>You have not placed any orders yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+        }
+
+        // Apply saved theme on load
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+            }
+        });
+    </script>
+</body>
+
+</html>

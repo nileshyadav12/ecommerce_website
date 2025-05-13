@@ -1,0 +1,135 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Checkout - FlipKart Style</title>
+  <style>
+    /* Add your CSS styling here */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .navbar {
+      background-color: #2874f0;
+      padding: 10px;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nav-links a {
+      color: #fff;
+      margin-left: 15px;
+      text-decoration: none;
+    }
+    .container {
+      padding: 20px;
+    }
+    .cart-items, .success-message {
+      margin-bottom: 30px;
+    }
+    .item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .total-price {
+      font-weight: bold;
+      font-size: 18px;
+      margin-top: 10px;
+    }
+    form {
+      margin-top: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #2874f0;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0d5ec2;
+    }
+    .message {
+      background-color: #e1f3e1;
+      border-left: 5px solid #4CAF50;
+      padding: 10px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 🔷 Navbar -->
+  <div class="navbar">
+    <div class="logo">ShopKart</div>
+    <div class="nav-links">
+      Hello, {{ request.user.first_name|default:request.user.username }} |
+      <a href="{% url 'order_list' %}">My Orders</a>
+      <a href="{% url 'logout' %}">Logout</a>
+      <a href="{% url 'add_address' %}">new_address</a>
+    </div>
+  </div>
+
+  <!-- ✅ Main Container -->
+  <div class="container">
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="message alert-{{ message.tags }}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    {% if order_confirmed %}
+      <div class="success-message">
+        <h2>🎉 Order Confirmed!</h2>
+        <p>Thank you for shopping with us, {{ request.user.first_name|default:request.user.username }}.</p>
+        <a href="{% url 'order_list' %}">Go to My Orders</a>
+      </div>
+    {% else %}
+    
+      <!-- 🛒 Cart Items -->
+      <div class="cart-items">
+        <h2>Your Cart</h2>
+        {% if cart.items.count %}
+          {% for item in cart.items.all %}
+            <div class="item">
+              <span><strong>{{ item.product.name }}</strong> (x{{ item.quantity }})</span>
+              <span>₹{{ item.total_price }}</span>
+            </div>
+          {% endfor %}
+          <div class="total-price">Total: ₹{{ total_price }}</div>
+        {% else %}
+          <p>Your cart is empty.</p>
+        {% endif %}
+      </div>
+
+      <!-- 🚚 Shipping Form -->
+      <div class="shipping-section">
+        <h2>Shipping Address</h2>
+
+        {% if form.fields.shipping_address.queryset.exists %}
+          <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">🛒 Place Order</button>
+          </form>
+        {% else %}
+{% if not form.fields.shipping_address.queryset.exists %}
+  <p>No addresses found. <a href="{% url 'add_address' %}">Add a new shipping address</a></p>
+{% endif %}
+        {% endif %}
+      </div>
+
+    {% endif %}
+  </div>
+
+</body>
+</html>

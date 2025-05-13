@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Purchase Successful</title>
+    <link rel="stylesheet" href="{% static 'shop/css/success.css' %}">
+</head>
+<body>
+    <div class="success-container">
+        <div class="checkmark">✓</div>
+        <h1>Thank You for Your Purchase!</h1>
+        <p>Your order has been placed successfully. You will receive a confirmation email shortly.</p>
+        <a href="{% url 'home' %}" class="btn">Continue Shopping</a>
+    </div>
+</body>
+</html>

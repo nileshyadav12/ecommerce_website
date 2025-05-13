@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Order Status</title>
+    {% comment %} <link rel="stylesheet" href="{% static 'css/styles.css' %}"> {% endcomment %}
+</head>
+<body>
+    <div class="container">
+        <h1>Update Order Status for {{ order_item.product.name }}</h1>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="status">Status:</label>
+                <select name="status" id="status" required>
+                    <option value="Pending" {% if order_item.status == "Pending" %}selected{% endif %}>Pending</option>
+                    <option value="Shipped" {% if order_item.status == "Shipped" %}selected{% endif %}>Shipped</option>
+                    <option value="Delivered" {% if order_item.status == "Delivered" %}selected{% endif %}>Delivered</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <button type="submit">Update Status</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

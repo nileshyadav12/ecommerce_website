@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ShopKart | Products</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f1f3f6;
+      margin: 0;
+    }
+
+    header {
+      background-color: #2c3e50;
+      color: white;
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      font-size: 26px;
+      font-weight: bold;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      transition: opacity 0.3s ease;
+    }
+
+    .nav-links a:hover {
+      opacity: 0.8;
+    }
+
+    .product-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 24px;
+      padding: 40px 20px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .product-item {
+      background-color: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .product-item:hover {
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      transform: translateY(-4px);
+    }
+
+    .product-item img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+
+    .product-item h2 {
+      font-size: 18px;
+      margin: 12px 0 4px;
+      color: #2c3e50;
+      min-height: 48px;
+    }
+
+    .product-item p {
+      font-size: 14px;
+      color: #555;
+      margin: 4px 0;
+    }
+
+    .price {
+      font-size: 18px;
+      font-weight: bold;
+      color: #27ae60;
+      margin-top: 4px;
+    }
+
+    .buttons {
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-top: 12px;
+    }
+
+    .button {
+      padding: 10px;
+      text-align: center;
+      border-radius: 6px;
+      font-weight: 600;
+      color: white;
+      text-decoration: none;
+      transition: background-color 0.3s;
+    }
+
+    .add-to-cart {
+      background-color: #f39c12;
+    }
+
+    .add-to-cart:hover {
+      background-color: #e67e22;
+    }
+
+    .view-details {
+      background-color: #2980b9;
+    }
+
+    .view-details:hover {
+      background-color: #1c6395;
+    }
+
+    .buy-now {
+      background-color: #27ae60;
+    }
+
+    .buy-now:hover {
+      background-color: #1e8449;
+    }
+
+    .wishlist-icon {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      font-size: 20px;
+      color: #e74c3c;
+      cursor: pointer;
+    }
+
+    .no-products {
+      text-align: center;
+      font-size: 20px;
+      color: #888;
+      margin-top: 80px;
+    }
+
+    @media (max-width: 600px) {
+      .nav-links {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+
+  <script>
+    function doubleClickToViewProduct(productId) {
+      window.location.href = "/product/" + productId + "/";
+    }
+  </script>
+</head>
+<body>
+
+<header>
+  <div class="brand">🛒 ShopKart</div>
+  <div class="nav-links">
+    {% if user.is_authenticated %}
+      <span>👤 Hello, {{ user.username }}</span>
+      {% if user.is_seller %}
+        <a href="{% url 'seller_dashboard' %}">Dashboard</a>
+      {% else %}
+        <a href="{% url 'customer_dashboard' %}">My Orders</a>
+      {% endif %}
+      <a href="{% url 'wishlist_view' %}">Wishlist</a>
+      <a href="{% url 'logout' %}">Logout</a>
+    {% else %}
+      <a href="{% url 'login' %}">Login</a>
+    {% endif %}
+  </div>
+</header>
+
+<div class="product-list">
+  {% for product in products %}
+    <div class="product-item">
+      <span class="wishlist-icon" title="Add to Wishlist">♡</span>
+      <img src="{{ product.image.url }}" alt="{{ product.name }}" onerror="this.src='/static/default.jpg';" ondblclick="doubleClickToViewProduct({{ product.id }})">
+      <h2>{{ product.name }}</h2>
+      <p>{{ product.description|truncatewords:12 }}</p>
+      <p class="price">${{ product.price }}</p>
+      <p>Stock: {{ product.quantity }}</p>
+      <div class="buttons">
+        <a href="{% url 'add_to_cart' product.id %}" class="button add-to-cart">Add to Cart</a>
+        <a href="{% url 'product_detail' product.id %}" class="button view-details">View Details</a>
+        <a href="{% url 'checkout' %}?product_id={{ product.id }}" class="button buy-now">Buy Now</a>
+      </div>
+    </div>
+  {% empty %}
+    <div class="no-products">🚫 No products available. Please check back later.</div>
+  {% endfor %}
+</div>
+
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Stock</title>
+    <style>
+        /* General page styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        h1, h2 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 24px;
+            color: #5a5a5a;
+        }
+
+        /* Center content for layout consistency */
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 40px;
+        }
+
+        .container ul {
+            padding-left: 20px;
+        }
+
+        .container li {
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        /* Form styling */
+        form {
+            display: flex;
+            flex-direction: column;
+            margin-top: 20px;
+        }
+
+        form label {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        form input[type="number"] {
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 350px;
+        }
+
+        /* Button styling */
+        .btn {
+            display: inline-block;
+            background-color: #007BFF;
+            color: white;
+            padding: 14px 28px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 18px;
+            margin-top: 12px;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* Additional styling for "Update Stock" button */
+        .update-btn {
+            background-color: #28a745;
+        }
+
+        .update-btn:hover {
+            background-color: #218838;
+        }
+
+        /* Styling for error/success messages */
+        .error-message, .success-message {
+            font-size: 16px;
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .error-message {
+            color: #fff;
+            background-color: #dc3545;
+        }
+
+        .success-message {
+            color: #fff;
+            background-color: #28a745;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 26px;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            form input[type="number"] {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Manage Your Stock</h1>
+
+    <!-- Display success message if exists -->
+    {% if messages %}
+        {% for message in messages %}
+            <p class="success-message">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Display error messages if any -->
+    {% if error_message %}
+        <p class="error-message">{{ error_message }}</p>
+    {% endif %}
+
+    <!-- If viewing a specific product -->
+    {% if product %}
+        <h2>{{ product.name }}</h2>
+        <p>Price: ${{ product.price }}</p>
+        <p>Current Stock Quantity: {{ product.quantity }}</p>
+
+        <form method="POST">
+            {% csrf_token %}
+            <label for="new_quantity">Update Quantity:</label>
+            <input type="number" name="new_quantity" id="new_quantity" value="{{ product.quantity }}" min="0">
+            <button type="submit" class="btn update-btn">Update Stock</button>
+        </form>
+
+        <!-- Back Button -->
+        <a href="{% url 'manage_stock' %}" class="btn">Back to Products</a>
+
+    <!-- If managing multiple products -->
+    {% elif products %}
+        <h2>Your Products</h2>
+        <ul>
+            {% for product in products %}
+                <li>
+                    <a href="{% url 'manage_stock' product.id %}" class="btn">{{ product.name }}</a> 
+                    - Stock: {{ product.quantity }}
+                </li>
+            {% endfor %}
+        </ul>
+
+        <!-- Back to the seller dashboard -->
+        <a href="{% url 'seller_dashboard' %}" class="btn">Back to Dashboard</a>
+
+    {% else %}
+        <p>No products available to manage stock.</p>
+    {% endif %}
+</div>
+
+</body>
+</html>

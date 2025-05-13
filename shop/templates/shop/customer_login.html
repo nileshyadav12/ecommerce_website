@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Dashboard</title>
+    <style>
+        /* Global Styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fc;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #007BFF;
+            margin-top: 30px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Customer Login Form Styling */
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
+        }
+
+        label {
+            display: block;
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            border-color: #007BFF;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .forgot-password {
+            display: block;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .forgot-password a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
+        .back-to-home {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+
+        .back-to-home a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+
+        .back-to-home a:hover {
+            text-decoration: underline;
+        }
+
+        /* Product List Styling */
+        .product-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .product-card {
+            width: 220px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            text-align: center;
+        }
+
+        .product-card img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+
+        .product-card h3 {
+            font-size: 18px;
+            color: #333;
+            margin: 10px 0;
+        }
+
+        .product-card p {
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 15px;
+        }
+
+        .product-card .price {
+            font-size: 16px;
+            color: #007BFF;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Page Content -->
+    <div class="container">
+        <h1>Customer Dashboard</h1>
+
+        <!-- Login Form Section -->
+        <div class="login-container">
+            <h2>Login</h2>
+            <form method="POST">
+                {% csrf_token %}
+
+                <!-- Username Field -->
+                <label for="username">Username:</label>
+                <input type="text" name="username" id="username" required>
+
+                <!-- Password Field -->
+                <label for="password">Password:</label>
+                <input type="password" name="password" id="password" required>
+
+                <!-- Submit Button -->
+                <button type="submit">Login</button>
+
+                <!-- Error Message -->
+                {% if error %}
+                    <p class="error-message">{{ error }}</p>
+                {% endif %}
+            </form>
+
+            <!-- Forgot Password Link -->
+            <div class="forgot-password">
+                {% comment %} <a href="{% url 'forgot_password' %}">Forgot your password?</a> {% endcomment %}
+            </div>
+
+            <!-- Back to Home Link -->
+            <div class="back-to-home">
+                <a href="{% url 'home' %}">Back to Home</a>
+            </div>
+        </div>
+
+        <!-- Products List Section -->
+        <div class="product-list">
+            {% for product in products %}
+                <div class="product-card">
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                    <h3>{{ product.name }}</h3>
+                    <p>{{ product.description }}</p>
+                    <div class="price">${{ product.price }}</div>
+                    <button>Add to Cart</button>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+
+</body>
+
+</html>

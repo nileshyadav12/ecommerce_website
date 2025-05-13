@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Notifications</title>
+    {% comment %} <link rel="stylesheet" href="{% static 'css/styles.css' %}"> {% endcomment %}
+</head>
+<body>
+    <div class="container">
+
+        <!-- Page Title -->
+        <h1 class="page-title">Seller Dashboard</h1>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <a href="{% url 'add_product' %}" class="btn">➕ Add New Product</a>
+            <button class="btn notification-button">🔔 View Notifications</button>
+            <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn logout-btn">Logout</button>
+            </form>
+        </div>
+
+        <!-- New Orders Section -->
+        <section class="orders-section">
+            <h2>New Orders</h2>
+            {% if orders %}
+                <ul class="order-list">
+                    {% for order in orders %}
+                        <li class="order-item">
+                            <p><strong>Order ID:</strong> {{ order.id }}</p>
+                            <p><strong>Total Price:</strong> ₹{{ order.total_price }}</p>
+                            <p><strong>Status:</strong> {{ order.status }}</p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No new orders.</p>
+            {% endif %}
+        </section>
+
+        <!-- Notifications Section -->
+        <section class="notifications-section">
+            <h2>Notifications</h2>
+            {% if notifications %}
+                <ul class="notification-list">
+                    {% for notification in notifications %}
+                        <li class="notification-item">
+                            <strong>{{ notification.product.name }}</strong>: {{ notification.message }}
+                            <small class="timestamp">({{ notification.created_at|date:"M d, Y H:i" }})</small>
+                            <form action="{% url 'mark_as_read' notification.id %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn mark-read-btn">Mark as Read</button>
+                            </form>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No new notifications.</p>
+            {% endif %}
+        </section>
+
+    </div>
+</body>
+</html>

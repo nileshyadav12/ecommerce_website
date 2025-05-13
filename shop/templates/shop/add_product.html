@@ -1,0 +1,75 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create a New Product</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to right, #e0f7fa, #ffffff);
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .form-container {
+            max-width: 700px;
+            margin: 60px auto;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            background: #ffffff;
+        }
+        h2 {
+            color: #2c3e50;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .btn-custom {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            transition: 0.3s ease;
+        }
+        .btn-custom:hover {
+            background-color: #218838;
+        }
+        .btn-secondary-custom {
+            background-color: #6c757d;
+            color: #fff;
+            border: none;
+        }
+        .form-check-input:checked {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        label {
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container form-container">
+        <div class="card">
+            <h2>🛒 Create a New Product</h2>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.as_p }}
+
+                <!-- Toggle example -->
+                <div class="form-check form-switch my-3">
+                    <input class="form-check-input" type="checkbox" id="featuredProduct" name="featured">
+                    <label class="form-check-label" for="featuredProduct">Mark as Featured</label>
+                </div>
+
+                <!-- Buttons -->
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="submit" class="btn btn-custom px-4">🚀 Publish Product</button>
+                    {% comment %} <a href="{% url 'shop:product_list' %}" class="btn btn-secondary-custom px-4">🔙 Cancel</a> {% endcomment %}
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

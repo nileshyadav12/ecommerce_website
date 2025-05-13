@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edit Product</title>
+  <style>
+    :root {
+      --bg-color: #f7f7f7;
+      --container-bg: #ffffff;
+      --text-color: #333;
+      --primary: #007BFF;
+      --danger: #dc3545;
+      --success: #28a745;
+      --info: #17a2b8;
+      --shadow: rgba(0, 0, 0, 0.1);
+    }
+
+    body.dark-mode {
+      --bg-color: #121212;
+      --container-bg: #1f1f1f;
+      --text-color: #f1f1f1;
+      --primary: #339af0;
+      --danger: #ff6b6b;
+      --success: #51cf66;
+      --info: #38d9a9;
+      --shadow: rgba(255, 255, 255, 0.05);
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 0;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 50px auto;
+      background-color: var(--container-bg);
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px var(--shadow);
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--primary);
+      font-size: 28px;
+      margin-bottom: 30px;
+    }
+
+    form {
+      display: grid;
+      gap: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      font-size: 16px;
+      color: var(--text-color);
+      margin-bottom: 6px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--primary);
+      outline: none;
+    }
+
+    .btn {
+      background-color: var(--primary);
+      color: white;
+      padding: 12px 24px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .btn:hover {
+      background-color: #0056b3;
+    }
+
+    .alert {
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      color: white;
+    }
+
+    .alert.success { background-color: var(--success); }
+    .alert.error { background-color: var(--danger); }
+    .alert.info { background-color: var(--info); }
+
+    .alert ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .back-link {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .back-link a {
+      text-decoration: none;
+      color: white;
+      background-color: #6c757d;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    .back-link a:hover {
+      background-color: #5a6268;
+    }
+
+    .toggle-container {
+      text-align: right;
+      margin-bottom: 15px;
+    }
+
+    .toggle-btn {
+      background: none;
+      border: 2px solid var(--primary);
+      color: var(--primary);
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+
+    .toggle-btn:hover {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    @media screen and (max-width: 768px) {
+      .container {
+        padding: 20px;
+        margin: 20px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .btn {
+        font-size: 16px;
+        padding: 10px 20px;
+      }
+
+      .back-link a {
+        font-size: 14px;
+        padding: 10px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="toggle-container">
+    <button class="toggle-btn" onclick="toggleTheme()"> Theme</button>
+  </div>
+
+  <h1>Edit Product: {{ product.name }}</h1>
+
+  {% if messages %}
+    <div>
+      {% for message in messages %}
+        <div class="alert {% if message.tags %}{{ message.tags }}{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="form-group">
+      <label for="id_name">Product Name:</label>
+      {{ form.name }}
+    </div>
+
+    <div class="form-group">
+      <label for="id_price">Price:</label>
+      {{ form.price }}
+    </div>
+
+    <div class="form-group">
+      <label for="id_quantity">Quantity:</label>
+      {{ form.quantity }}
+    </div>
+
+    <div class="form-group">
+      <label for="id_description">Description:</label>
+      {{ form.description }}
+    </div>
+
+    <div class="form-group">
+      <label for="id_image">Image:</label>
+      {{ form.image }}
+    </div>
+
+    {% if form.errors %}
+      <div class="alert error">
+        <ul>
+          {% for field in form %}
+            {% for error in field.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <button class="btn" type="submit">Update Product</button>
+  </form>
+
+  <div class="back-link">
+    <a href="{% url 'seller_dashboard' %}">Back to Dashboard</a>
+  </div>
+</div>
+
+<script>
+  function toggleTheme() {
+    document.body.classList.toggle('dark-mode');
+    localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+  }
+
+  // Apply saved theme on load
+  window.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      document.body.classList.add('dark-mode');
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,30 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Ecommerce Website{% endblock %}</title>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{% url 'product_list' %}">Home</a></li>
+                <!-- Updated Sign Up link to separate customer and seller signups -->
+                <li><a href="{% url 'customer_signup' %}">Sign Up as Customer</a></li>
+                <li><a href="{% url 'seller_signup' %}">Sign Up as Seller</a></li>
+                <li><a href="{% url 'seller_login' %}">Seller Login</a></li>
+                <li><a href="{% url 'customer_login' %}">Customer Login</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div id="content">
+        {% block content %}
+        <!-- Content will be inserted here -->
+        {% endblock %}
+    </div>
+</body>
+</html>

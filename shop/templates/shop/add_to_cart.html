@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Added to Cart</title>
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            margin: 20px;
+        }
+
+        h1 {
+            color: #007BFF;
+            font-size: 26px;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .product-name {
+            font-weight: bold;
+            color: #007BFF;
+        }
+
+        .btn {
+            background-color: #007BFF;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 5px;
+            text-decoration: none;
+            display: inline-block;
+            transition: 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .navigation {
+            margin-top: 20px;
+        }
+
+        .price-info {
+            font-size: 18px;
+            color: #333;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            p {
+                font-size: 16px;
+            }
+
+            .btn {
+                font-size: 14px;
+                padding: 10px 20px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Product Added to Your Cart</h1>
+        <p>You have successfully added <span class="product-name">{{ product.name }}</span> to your cart.</p>
+        <p>Quantity: {{ cart.cartitem_set.filter(product=product).first().quantity }}</p>
+
+        <!-- Optional: Show price per unit and total price for this item -->
+        <div class="price-info">
+            <p>Price per unit: ${{ product.price }}</p>
+            <p>Total: ${{ product.price * cart.cartitem_set.filter(product=product).first().quantity }}</p>
+        </div>
+
+        <div class="navigation">
+            <a href="{% url 'cart:cart_detail' %}" class="btn">View Cart</a>
+            <a href="{% url 'shop:home' %}" class="btn">Continue Shopping</a>
+        </div>
+    </div>
+
+</body>
+
+</html>

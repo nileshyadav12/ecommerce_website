@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.name }} - Product Detail</title>
+    <style>
+        /* General Body Styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f4f7; /* Light background */
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s ease;
+            color: #333;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-top: 40px;
+            font-size: 36px;
+        }
+
+        /* Product Detail Container */
+        .product-detail-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 40px;
+            gap: 40px;
+            padding: 0 20px;
+            flex-wrap: wrap;
+        }
+
+        /* Product Image Styling */
+        .product-image {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            object-fit: cover;
+        }
+
+        .product-image:hover {
+            transform: scale(1.1); /* Enhanced zoom effect */
+        }
+
+        /* Product Information Box Styling */
+        .product-info {
+            max-width: 600px;
+            text-align: left;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            flex-grow: 1;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-info h2 {
+            font-size: 32px;
+            color: #34495e;
+            margin-bottom: 20px;
+        }
+
+        .product-info p {
+            font-size: 18px;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+
+        .price {
+            font-size: 26px;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 20px;
+        }
+
+        /* Button Styling */
+        .add-to-cart-btn,
+        .back-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 14px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 18px;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+            text-align: center;
+        }
+
+        .add-to-cart-btn:hover {
+            background-color: #218838;
+        }
+
+        .back-btn {
+            background-color: #007bff;
+        }
+
+        .back-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* Top Buttons (for logged-in users) */
+        .top-buttons {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 18px;
+        }
+
+        .top-buttons a {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            background-color: #2980b9;
+            transition: background-color 0.3s ease;
+        }
+
+        .top-buttons a:hover {
+            background-color: #1f6f8b;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .product-detail-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
+
+            .product-image {
+                max-width: 90%;
+            }
+
+            .product-info {
+                max-width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Top navigation buttons for logged-in users -->
+    {% if user.is_authenticated %}
+    <div class="top-buttons">
+        <span>Welcome, {{ user.username }}!</span>
+        <a href="{% url 'home' %}" class="back-btn">Home</a>
+        <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+    </div>
+    {% endif %}
+
+    <h1>{{ product.name }}</h1>
+
+    <div class="product-detail-container">
+        <!-- Product Image -->
+        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image" id="product-image">
+
+        <!-- Product Info -->
+        <div class="product-info">
+            <h2>{{ product.name }}</h2>
+            <p><strong>Description:</strong> {{ product.description }}</p>
+            <p><strong>Price:</strong> <span class="price">${{ product.price }}</span></p>
+            <p><strong>In Stock:</strong> {{ product.quantity }}</p>
+
+            <!-- Add to Cart Button -->
+            <a href="{% url 'add_to_cart' product.id %}" class="add-to-cart-btn">Add to Cart</a>
+
+            <!-- Back to Home Button -->
+            <a href="{% url 'home' %}" class="back-btn">Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        // Optional zoom functionality for the product image
+        const productImage = document.getElementById('product-image');
+        
+        productImage.addEventListener('click', function() {
+            if (productImage.style.transform === 'scale(2)') {
+                productImage.style.transform = 'scale(1)';
+            } else {
+                productImage.style.transform = 'scale(2)';
+            }
+        });
+    </script>
+
+</body>
+
+</html>

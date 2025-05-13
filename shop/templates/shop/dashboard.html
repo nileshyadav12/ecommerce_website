@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        header {
+            background-color: #2874f0;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-header {
+            font-weight: bold;
+            font-size: 1.5em;
+            color: #2874f0;
+            margin-bottom: 15px;
+        }
+
+        .order-list,
+        .product-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .order-item,
+        .product-item {
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .order-item:hover,
+        .product-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .order-item .status {
+            font-weight: bold;
+            color: #d32f2f;
+        }
+
+        .action-btn {
+            background-color: #2874f0;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+            text-align: center;
+        }
+
+        .action-btn:hover {
+            background-color: #1c63cc;
+        }
+
+        .product-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: space-between;
+        }
+
+        .product-item {
+            width: 220px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .product-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .product-item .price {
+            font-size: 18px;
+            color: #2874f0;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .empty-message {
+            text-align: center;
+            font-size: 16px;
+            color: #777;
+            padding: 20px 0;
+        }
+
+        .logout-btn {
+            background-color: #555;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+            text-align: center;
+        }
+
+        .logout-btn:hover {
+            background-color: #333;
+        }
+
+        @media screen and (max-width: 768px) {
+            .product-item {
+                width: 100%;
+                margin: 0 auto;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            .section-header {
+                font-size: 1.3em;
+            }
+
+            .order-list,
+            .product-list {
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Welcome, {{ user.username }}!</h1>
+        <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+    </header>
+
+    <div class="container">
+        <!-- Orders Section (Visible to Customers Only) -->
+        {% if is_customer %}
+            <h2 class="section-header">Your Orders</h2>
+            {% if orders %}
+                <ul class="order-list">
+                    {% for order in orders %}
+                        <li class="order-item">
+                            <h3>Order #{{ order.id }}</h3>
+                            <p>Total: ${{ order.total_price|floatformat:2 }}</p>
+                            <p>Status: <span class="status">{{ order.status }}</span></p>
+                            <p>Date: {{ order.created_at|date:"F j, Y" }}</p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="empty-message">No orders yet. <a href="{% url 'product_list' %}">Shop now</a>.</p>
+            {% endif %}
+        {% endif %}
+
+        <!-- Products Section (Visible to Sellers Only) -->
+        {% if is_seller %}
+            <h2 class="section-header">Your Products</h2>
+            {% if products %}
+                <div class="product-list">
+                    {% for product in products %}
+                        <div class="product-item">
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                            <h3>{{ product.name }}</h3>
+                            <p class="price">${{ product.price|floatformat:2 }}</p>
+                            <a href="{% url 'product_detail' product.id %}" class="action-btn">View Details</a>
+                            <a href="{% url 'edit_product' product.id %}" class="action-btn">Edit Product</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="empty-message">You don't have any products. <a href="{% url 'add_product' %}">Add a product</a>.</p>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <!-- Password Change Modal -->
+    <div id="passwordModal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closePasswordPopup()">&times;</span>
+            <h3>Change Password</h3>
+            <form method="post" action="{% url 'change_password' %}">
+                {% csrf_token %}
+                <label>Old Password:</label>
+                <input type="password" name="old_password" required>
+
+                <label>New Password:</label>
+                <input type="password" name="new_password" required>
+
+                <button type="submit">Update Password</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openPasswordPopup() {
+            document.getElementById('passwordModal').style.display = 'block';
+        }
+
+        function closePasswordPopup() {
+            document.getElementById('passwordModal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
