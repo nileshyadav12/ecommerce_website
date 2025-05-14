@@ -6,10 +6,9 @@ from decimal import Decimal
 from django.utils import timezone
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
-# -------------------------
-# Custom User Model
-# -------------------------
+from django.core.mail import send_mail
+from django.db import models
+from django.contrib.auth.models import User
 
 class CustomUser(AbstractUser):
     is_customer = models.BooleanField(default=False)
@@ -18,10 +17,6 @@ class CustomUser(AbstractUser):
     def get_full_name(self):
         return f"{self.first_name} {self.last_name}"
 
-
-# -------------------------
-# Profile Model
-# -------------------------
 class Profile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     reset_token = models.CharField(max_length=32, blank=True, null=True)
@@ -29,112 +24,10 @@ class Profile(models.Model):
     def __str__(self):
         return self.user.username
 
-# Automatically create a Profile when a new user is created
 @receiver(post_save, sender=CustomUser)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
-
-# -------------------------
-# Product Model
-# -------------------------
-# class Product(models.Model):
-#     seller = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='products')  # Custom User model
-#     name = models.CharField(max_length=255)
-#     description = models.TextField(blank=True, null=True)
-#     price = models.DecimalField(max_digits=10, decimal_places=2)
-#     quantity = models.PositiveIntegerField(default=0)
-#     available = models.BooleanField(default=True)
-#     image = models.ImageField(upload_to='products/')
-    
-
-#     def __str__(self):
-#         return self.name
-
-#     def update_stock(self, quantity_sold):
-#         """
-#         Update the product stock after a sale.
-#         Raises a ValidationError if stock is insufficient.
-#         """
-#         if quantity_sold > self.quantity:
-#             raise ValidationError("Not enough stock available.")
-#         with transaction.atomic():
-#             self.quantity -= quantity_sold
-#             self.update_availability()  # Ensure availability is updated after stock is modified
-#             self.save()
-
-#     def is_in_stock(self):
-#         """
-#         Check if the product is in stock.
-#         """
-#         return self.quantity > 0
-
-#     def restock(self, additional_stock):
-#         """
-#         Restock the product with additional stock.
-#         """
-#         if additional_stock < 0:
-#             raise ValidationError("Restock quantity cannot be negative.")
-#         with transaction.atomic():
-#             self.quantity += additional_stock
-#             self.update_availability()  # Ensure availability is updated after restocking
-#             self.save()
-
-#     def update_availability(self):
-#         """
-#         Update the product's availability based on stock quantity.
-#         If stock is greater than 0, the product is available.
-#         """
-#         self.available = self.is_in_stock()
-#         self.save()
-
-#     class Meta:
-#         ordering = ['name']
-
-# -------------------------
-# Cart Model
-# -------------------------
-# class Cart(models.Model):
-#     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-#     status = models.CharField(max_length=20, choices=[('active', 'Active'), ('completed', 'Completed')])
-
-#     def __str__(self):
-#         return f"Cart {self.id} for {self.user.username}"
-
-#     def calculate_total(self):
-#         total = sum(item.total_price for item in self.cart_items.all())
-#         return total
-
-#     def clear_cart(self):
-#         self.cart_items.all().delete()
-
-# # -------------------------
-# # CartItem Model
-# # -------------------------
-# class CartItem(models.Model):
-#     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
-#     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-#     quantity = models.PositiveIntegerField(default=1)
-
-#     @property
-#     def total_price(self):
-#         if self.product.is_in_stock():
-#             return self.quantity * self.product.price
-#         return Decimal('0.00')
-
-#     def __str__(self):
-#         return f"{self.product.name} (Qty: {self.quantity})"
-
-
-
-
-
-
-
-from django.db import models, transaction
-from django.core.exceptions import ValidationError
-from django.conf import settings
-
 class Product(models.Model):
     seller = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='products')  # Custom User model
     name = models.CharField(max_length=255)
@@ -186,24 +79,6 @@ class Product(models.Model):
 
     class Meta:
         ordering = ['name']
-
-
-
-
-
-
-
-
-
-
-
-from django.conf import settings
-from django.db import models
-from decimal import Decimal
-
-# -------------------------
-# Cart Model
-# -------------------------
 class Cart(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     status = models.CharField(
@@ -223,9 +98,6 @@ class Cart(models.Model):
         self.items.all().delete()
 
 
-# -------------------------
-# CartItem Model
-# -------------------------
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey('Product', on_delete=models.CASCADE)  # Assuming Product is defined in your app
@@ -240,47 +112,6 @@ class CartItem(models.Model):
 
     def __str__(self):
         return f"{self.product.name} (Qty: {self.quantity})"
-
-# -------------------------
-# Order & OrderItem Models
-# -------------------------
-from django.db import models
-from django.conf import settings
-# from shop.models import Address  # Make sure to import the Address model
-
-# class Order(models.Model):
-#     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-#     shipping_address = models.ForeignKey('Address', on_delete=models.SET_NULL, null=True, blank=True)   # Link to Address model
-#     total_price = models.DecimalField(max_digits=10, decimal_places=2)
-#     payment_method = models.CharField(
-#         max_length=50,
-#         choices=[('cash_on_delivery', 'Cash on Delivery'), 
-#                  ('credit', 'Credit Card'), 
-#                  ('paypal', 'PayPal')]
-#     )
-#     status = models.CharField(max_length=50, default='pending')
-#     phone = models.CharField(max_length=20, null=True, blank=True)
-#     email = models.EmailField(null=False, default="placeholder@example.com")
-#     created_at = models.DateTimeField(auto_now_add=True)
-
-#     def __str__(self):
-#         return f"Order {self.id} by {self.user.username}"
-
-#     def update_status(self, new_status):
-#         self.status = new_status
-#         self.save()
-
-
-
-
-
-
-
-
-from django.db import models
-from django.conf import settings
-from django.core.mail import send_mail
-from django.db import transaction
 
 class Order(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -330,37 +161,6 @@ class Order(models.Model):
         )
 
 
-
-
-
-
-
-
-
-# -------------------------
-# OrderItem Model
-# -------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-from django.db import models
-from django.core.exceptions import ValidationError
-from decimal import Decimal
-
 class OrderItem(models.Model):
     STATUS_CHOICES = [
         ('Pending', 'Pending'),
@@ -405,39 +205,6 @@ class OrderItem(models.Model):
         self.update_stock_on_status_change()  # Update stock based on status
         super().save(*args, **kwargs)
 
-
-
-
-
-
-# class OrderItem(models.Model):
-#     STATUS_CHOICES = [
-#         ('Pending', 'Pending'),
-#         ('Shipped', 'Shipped'),
-#         ('Delivered', 'Delivered'),
-#     ]
-
-#     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items')
-#     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-#     quantity = models.PositiveIntegerField()
-#     price = models.DecimalField(max_digits=10, decimal_places=2)  # Add the price field here
-#     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
-
-#     def total_price(self):
-#         return Decimal(self.price) * Decimal(self.quantity)
-
-#     def clean(self):
-#         if self.quantity <= 0:
-#             raise ValidationError("Quantity must be greater than zero.")
-
-#     def __str__(self):
-#         return f"{self.quantity} x {self.product.name} (Order {self.order.id})"
-
-# -------------------------
-# Payment Model
-# -------------------------
 class Payment(models.Model):
     PAYMENT_METHOD_CHOICES = [
         ('Credit Card', 'Credit Card'),
@@ -480,10 +247,6 @@ class Payment(models.Model):
                 raise ValidationError("EMI amount exceeds total order price.")
         if self.payment_method in ['Credit Card', 'Debit Card'] and not self.card_number:
             raise ValidationError("Card number is required for card payments.")
-
-# -------------------------
-# Review Model
-# -------------------------
 class Review(models.Model):
     customer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='reviews')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="reviews")
@@ -497,9 +260,6 @@ class Review(models.Model):
     def __str__(self):
         return f"Review by {self.customer.username} on {self.product.name} - {self.rating}/5"
 
-# -------------------------
-# Wishlist Model
-# -------------------------
 class Wishlist(models.Model):
     customer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='wishlist')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="wishlist_items")
@@ -511,9 +271,7 @@ class Wishlist(models.Model):
     def __str__(self):
         return f"{self.customer.username}'s wishlist - {self.product.name}"
 
-# -------------------------
-# Address Model
-# -------------------------
+
 class Address(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="addresses")
     street = models.CharField(max_length=255)
@@ -530,16 +288,6 @@ class Address(models.Model):
             raise ValidationError("Zip code must be numeric.")
         if len(self.zip_code) < 5 or len(self.zip_code) > 10:
             raise ValidationError("Zip code must be between 5 and 10 digits.")
-from django.db import models
-from django.contrib.auth.models import User
-from django.conf import settings
-
-
-from django.conf import settings
-from django.db import models
-
-from django.db import models
-from django.conf import settings
 
 class Notification(models.Model):
     seller = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')
