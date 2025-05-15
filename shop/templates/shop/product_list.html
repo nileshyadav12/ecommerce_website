@@ -203,7 +203,7 @@
       <img src="{{ product.image.url }}" alt="{{ product.name }}" onerror="this.src='/static/default.jpg';" ondblclick="doubleClickToViewProduct({{ product.id }})">
       <h2>{{ product.name }}</h2>
       <p>{{ product.description|truncatewords:12 }}</p>
-      <p class="price">${{ product.price }}</p>
+      <p class="price">₹{{ product.price }}</p>
       <p>Stock: {{ product.quantity }}</p>
       <div class="buttons">
         <a href="{% url 'add_to_cart' product.id %}" class="button add-to-cart">Add to Cart</a>

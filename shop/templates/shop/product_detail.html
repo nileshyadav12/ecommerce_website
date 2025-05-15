@@ -176,11 +176,11 @@
         <div class="product-info">
             <h2>{{ product.name }}</h2>
             <p><strong>Description:</strong> {{ product.description }}</p>
-            <p><strong>Price:</strong> <span class="price">${{ product.price }}</span></p>
+            <p><strong>Price:</strong> <span class="price">₹{{ product.price }}</span></p>
             <p><strong>In Stock:</strong> {{ product.quantity }}</p>
 
             <!-- Add to Cart Button -->
-            <a href="{% url 'add_to_cart' product.id %}" class="add-to-cart-btn">Add to Cart</a>
+            <a href="{% url 'add_to_cart' product.id %}" class="add-to-cart-btn">Add  to Cart</a>
 
             <!-- Back to Home Button -->
             <a href="{% url 'home' %}" class="back-btn">Back to Home</a>

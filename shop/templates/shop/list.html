@@ -1,0 +1,20 @@
+C:\Users\Deepak\nil\mygreatshop-website\shop\templates\shop\list.html
+
+
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Notifications</h2>
+<ul>
+    {% for notification in notifications %}
+        <li style="{% if not notification.is_read %}font-weight: bold;{% endif %}">
+            {{ notification.message }} — {{ notification.created_at|naturaltime }}
+            {% if not notification.is_read %}
+                <a href="{% url 'mark_notification_as_read' notification.id %}">Mark as read</a>
+            {% endif %}
+        </li>
+    {% empty %}
+        <li>No notifications.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

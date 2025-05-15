@@ -98,9 +98,32 @@ class ProductForm(forms.ModelForm):
         if image:
             if image.size > 5 * 1024 * 1024:
                 raise ValidationError("Image size must not exceed 5MB.")
-            if hasattr(image, 'content_type') and image.content_type not in ['image/jpeg', 'image/png']:
+            if hasattr(image, 'content_type') and image.content_type not in ['image/jpeg', 'image/png','image/webp']:
                 raise ValidationError("Only JPG and PNG formats are allowed.")
         return image
+
+from .models import ProductImage
+
+class ProductImageForm(forms.Form):
+    # # Use FileField with multiple attribute to handle multiple file uploads
+    # images = forms.FileField(
+    #     widget=forms.ClearableFileInput(attrs={'multiple': True}),
+    #     required=False
+    # )
+
+    def clean_images(self):
+        images = self.files.getlist('images')  # Get the list of uploaded images
+        allowed_types = ['image/jpeg', 'image/png', 'image/webp']
+
+        for image in images:
+            if image.size > 5 * 1024 * 1024:  # Check for 5MB file size limit
+                raise forms.ValidationError("Each image must be less than 5MB.")
+            if image.content_type not in allowed_types:
+                raise forms.ValidationError("Only JPG, PNG, and WebP formats are allowed.")
+        
+        return images
+
+
 
 # -------------------------------
 # Address Form

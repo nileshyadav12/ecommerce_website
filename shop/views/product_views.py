@@ -64,28 +64,47 @@ def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk)
     return render(request, 'shop/product_detail.html', {'product': product})
 
-# -----------------------------
-# Add Product View (Seller)
-# -----------------------------
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from shop.forms import ProductForm, ProductImageForm
+from shop.models import Product, ProductImage
+from django.contrib.auth.decorators import login_required
+
 @login_required
 def add_product(request):
     """
-    Allow the logged-in seller to add a new product.
+    Allow the logged-in seller to add a new product along with images.
     """
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES)
-        if form.is_valid():
+        image_form = ProductImageForm(request.POST, request.FILES)
+
+        if form.is_valid() and image_form.is_valid():
+            # Save the product
             product = form.save(commit=False)
-            product.seller = request.user  # Set logged-in user as the seller
+            product.seller = request.user  # Set the logged-in user as the seller
             product.save()
+
+            # Save the images for the product
+            images = request.FILES.getlist('images')
+            for img in images:
+                ProductImage.objects.create(product=product, image=img)
+
             messages.success(request, 'Product added successfully!')
-            return redirect('view_all_products')
+            return redirect('view_all_products')  # Redirect to the product listing or another page
+
         else:
             messages.error(request, 'Error adding product. Please check the form.')
+
     else:
         form = ProductForm()
-    
-    return render(request, 'shop/add_product.html', {'form': form})
+        image_form = ProductImageForm()
+
+    return render(request, 'shop/add_product.html', {
+        'form': form,
+        'image_form': image_form
+    })
 
 # -----------------------------
 # View All Seller's Products

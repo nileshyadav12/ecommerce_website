@@ -9,7 +9,7 @@
 <body>
     <h1>Payment</h1>
     <p>Order ID: {{ order.id }}</p>
-    <p>Amount to Pay: ${{ order.total_price }}</p>
+    <p>Amount to Pay: ₹{{ order.total_price }}</p>
     <form method="POST">
         {% csrf_token %}
         <label for="payment_method">Payment Method:</label>

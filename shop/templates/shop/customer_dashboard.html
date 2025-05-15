@@ -5,38 +5,66 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Customer dashboard to view orders and shop products." />
   <meta name="keywords" content="ecommerce, dashboard, orders, products, shop" />
-  <title>Dashboard | ShopEase</title>
+  <title>ShopKart - Dashboard</title>
   <link rel="icon" href="/static/favicon.ico" />
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
+    /* Global styles */
     body {
       font-family: 'Roboto', sans-serif;
-      background-color: #f4f6f9;
       margin: 0;
       padding: 0;
       color: #333;
+      background-color: #f4f6f9;
     }
-
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+    
+    /* Navbar styles */
     header {
       background-color: #2874f0;
       color: white;
-      padding: 20px 30px;
+      padding: 10px 50px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
     .logo {
       font-size: 24px;
       font-weight: bold;
+      letter-spacing: 1px;
     }
 
-    .top-buttons {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
+    .nav-links a {
+      color: white;
+      margin: 0 15px;
+      font-size: 16px;
+    }
+
+    .search-bar input {
+      padding: 10px;
+      border-radius: 20px;
+      border: none;
+      width: 300px;
+      font-size: 14px;
+    }
+
+    .search-bar button {
+      padding: 10px 20px;
+      background-color: #ff5722;
+      color: white;
+      border-radius: 20px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .search-bar button:hover {
+      background-color: #e64a19;
     }
 
     .top-buttons a {
@@ -50,13 +78,14 @@
       text-decoration: none;
       font-size: 15px;
       border: 1px solid white;
-      transition: background-color 0.3s;
+      transition: background-color 0.3s ease;
     }
 
     .top-buttons a:hover {
       background-color: #1a5fdc;
     }
 
+    /* Container styles */
     .container {
       max-width: 1200px;
       margin: 30px auto;
@@ -72,50 +101,6 @@
       color: #2874f0;
       margin: 40px 0 20px;
       text-align: center;
-      position: relative;
-    }
-
-    .order-list,
-    .product-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .order-item,
-    .product-item {
-      background-color: #fdfdfd;
-      border-radius: 12px;
-      padding: 20px;
-      margin: 15px 0;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .order-item:hover,
-    .product-item:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 20px rgba(0, 0, 0, 0.1);
-    }
-
-    .status {
-      font-weight: bold;
-      color: #d32f2f;
-    }
-
-    .action-btn {
-      background-color: #2874f0;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 6px;
-      text-decoration: none;
-      display: inline-block;
-      margin-top: 10px;
-      transition: background-color 0.3s;
-    }
-
-    .action-btn:hover {
-      background-color: #1c63cc;
     }
 
     .product-list {
@@ -127,22 +112,38 @@
 
     .product-item {
       width: calc(25% - 20px);
-      text-align: center;
+      background-color: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s, box-shadow 0.2s;
     }
 
     .product-item img {
       width: 100%;
-      height: 180px;
+      height: 200px;
       object-fit: cover;
-      border-radius: 8px;
-      margin-bottom: 10px;
+      transition: transform 0.3s ease;
     }
 
-    .price {
-      font-size: 18px;
+    .product-item img:hover {
+      transform: scale(1.05);
+    }
+
+    .product-info {
+      padding: 15px;
+      text-align: center;
+    }
+
+    .product-info h3 {
+      font-size: 16px;
+      margin: 10px 0;
+    }
+
+    .product-info .price {
       color: #2874f0;
       font-weight: bold;
-      margin-bottom: 10px;
+      font-size: 18px;
     }
 
     .empty-message {
@@ -152,6 +153,7 @@
       padding: 30px 0;
     }
 
+    /* Media Queries for Responsiveness */
     @media screen and (max-width: 1024px) {
       .product-item {
         width: calc(50% - 20px);
@@ -163,8 +165,17 @@
         width: 100%;
       }
 
-      .container {
-        padding: 20px;
+      .search-bar input {
+        width: 100%;
+      }
+
+      header {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .nav-links {
+        display: none;
       }
 
       .top-buttons {
@@ -174,58 +185,46 @@
     }
   </style>
 </head>
+
 <body>
+  <!-- 🔷 Navbar -->
   <header>
-    <div class="logo">ShopEase</div>
-    <div class="top-buttons">
-      <a href="{% url 'product_list' %}"><i class="fas fa-store"></i> Browse</a>
-      <a href="{% url 'order_list' %}"><i class="fas fa-box"></i> My Orders</a>
+    <div class="logo">ShopKart</div>
+    <div class="search-bar">
+      <input type="text" placeholder="Search for products, brands, and more..." />
+      <button>Search</button>
+    </div>
+    <div class="nav-links">
+      <a href="{% url 'product_list' %}"><i class="fas fa-store"></i> Shop</a>
+      <a href="{% url 'order_list' %}"><i class="fas fa-box"></i> Orders</a>
       <a href="{% url 'profile' %}"><i class="fas fa-user-edit"></i> Profile</a>
       <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+    <div class="top-buttons">
+      {% comment %} <a href="{% url 'cart' %}"><i class="fas fa-shopping-cart"></i> Cart</a> {% endcomment %}
+      <a href="{% url 'order_list' %}"><i class="fas fa-box"></i> Orders</a>
     </div>
   </header>
 
   <div class="container">
-    <h2 class="section-header">Hello, {{ user.username }}!</h2>
+    <h2 class="section-header">Featured Products</h2>
 
-    <!-- Orders -->
-    <h2 class="section-header">Your Orders</h2>
-    {% if orders %}
-      <ul class="order-list">
-        {% for order in orders %}
-          <li class="order-item">
-            <h3>Order #{{ order.id }}</h3>
-            <p>Total: ₹{{ order.total_price|floatformat:2 }}</p>
-            <p>Status: <span class="status">{{ order.status }}</span></p>
-            <p>Ordered on: {{ order.date_ordered|date:"F j, Y" }}</p>
-          </li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <p class="empty-message">You haven’t placed any orders yet. <a href="{% url 'product_list' %}">Start shopping!</a></p>
-    {% endif %}
-
-    <!-- Products -->
-    <h2 class="section-header">Available Products</h2>
     <div class="product-list">
       {% for product in products %}
         <div class="product-item">
           <img src="{{ product.image.url }}" alt="{{ product.name }}" />
-          <h3>{{ product.name }}</h3>
-          <p class="price">₹{{ product.price|floatformat:2 }}</p>
-          <a href="{% url 'product_detail' product.id %}" class="action-btn">View</a>
-          <a href="{% url 'add_to_cart' product.id %}" class="action-btn">Add to Cart</a>
+          <div class="product-info">
+            <h3>{{ product.name }}</h3>
+            <p class="price">₹{{ product.price|floatformat:2 }}</p>
+            <a href="{% url 'product_detail' product.id %}" class="action-btn">View</a>
+            <a href="{% url 'add_to_cart' product.id %}" class="action-btn">Add to Cart</a>
+          </div>
         </div>
       {% empty %}
         <p class="empty-message">No products available at the moment.</p>
       {% endfor %}
     </div>
-
-    {% if user.is_seller %}
-      <div style="text-align:center; margin-top:40px;">
-        <a href="{% url 'seller_dashboard' %}" class="action-btn">Go to Seller Dashboard</a>
-      </div>
-    {% endif %}
   </div>
+
 </body>
 </html>

@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Checkout - FlipKart Style</title>
   <style>
-    /* Add your CSS styling here */
+    /* Styling */
     body {
       font-family: Arial, sans-serif;
       margin: 0;
@@ -61,7 +61,26 @@
       padding: 10px;
       margin-bottom: 20px;
     }
+    .message.alert-success {
+      background-color: #d4edda;
+      border-color: #c3e6cb;
+    }
+    .message.alert-danger {
+      background-color: #f8d7da;
+      border-color: #f5c6cb;
+    }
   </style>
+  <script>
+    // JavaScript to hide the success message after a short delay
+    function hideSuccessMessage() {
+      setTimeout(() => {
+        const successMessage = document.getElementById('success-message');
+        if (successMessage) {
+          successMessage.style.display = 'none';
+        }
+      }, 3000); // Hide after 3 seconds
+    }
+  </script>
 </head>
 <body>
 
@@ -72,13 +91,12 @@
       Hello, {{ request.user.first_name|default:request.user.username }} |
       <a href="{% url 'order_list' %}">My Orders</a>
       <a href="{% url 'logout' %}">Logout</a>
-      <a href="{% url 'add_address' %}">new_address</a>
+      <a href="{% url 'add_address' %}">Add Address</a>
     </div>
   </div>
 
   <!-- ✅ Main Container -->
   <div class="container">
-
     {% if messages %}
       {% for message in messages %}
         <div class="message alert-{{ message.tags }}">
@@ -88,11 +106,12 @@
     {% endif %}
 
     {% if order_confirmed %}
-      <div class="success-message">
+      <div class="success-message" id="success-message">
         <h2>🎉 Order Confirmed!</h2>
         <p>Thank you for shopping with us, {{ request.user.first_name|default:request.user.username }}.</p>
         <a href="{% url 'order_list' %}">Go to My Orders</a>
       </div>
+      <script> hideSuccessMessage(); </script>
     {% else %}
     
       <!-- 🛒 Cart Items -->
@@ -114,7 +133,6 @@
       <!-- 🚚 Shipping Form -->
       <div class="shipping-section">
         <h2>Shipping Address</h2>
-
         {% if form.fields.shipping_address.queryset.exists %}
           <form method="post">
             {% csrf_token %}
@@ -122,9 +140,7 @@
             <button type="submit">🛒 Place Order</button>
           </form>
         {% else %}
-{% if not form.fields.shipping_address.queryset.exists %}
-  <p>No addresses found. <a href="{% url 'add_address' %}">Add a new shipping address</a></p>
-{% endif %}
+          <p>No addresses found. <a href="{% url 'add_address' %}">Add a new shipping address</a></p>
         {% endif %}
       </div>
 

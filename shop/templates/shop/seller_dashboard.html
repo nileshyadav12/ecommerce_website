@@ -193,6 +193,7 @@
         <li>
           <div class="notification-content">
             <p><strong>{{ notification.message }}</strong> ({{ notification.created_at|date:"Y-m-d H:i" }})</p>
+            <p class="status-feedback" style="color: green; font-size: 14px; display: none;"></p>
           </div>
           <div class="notification-actions">
             {% if not notification.is_read %}
@@ -203,10 +204,13 @@
             {% else %}
               <span style="color: #28a745;">✔ Read</span>
             {% endif %}
+            
+            <!-- Status Update Form -->
             <form action="{% url 'update_order_status' notification.product.id %}" method="post">
               {% csrf_token %}
-              <select name="order_status" class="status-dropdown">
+              <select name="order_status" class="status-dropdown" onchange="showStatusMessage(this)">
                 <option value="Pending" {% if notification.product.order_status == 'Pending' %}selected{% endif %}>Pending</option>
+                <option value="Shipped" {% if notification.product.order_status == 'Shipped' %}selected{% endif %}>Shipped</option>
                 <option value="Out for Delivery" {% if notification.product.order_status == 'Out for Delivery' %}selected{% endif %}>Out for Delivery</option>
                 <option value="Delivered" {% if notification.product.order_status == 'Delivered' %}selected{% endif %}>Delivered</option>
               </select>
@@ -245,11 +249,6 @@
           {% endif %}
           <p class="order-status">Status: {{ product.order_status }}</p>
 
-          <form action="{% url 'update_order_status' product.id %}" method="post">
-            {% csrf_token %}
-            
-          </form>
-
           <div class="product-actions">
             <a href="{% url 'edit_product' product.id %}">Edit</a>
             <a href="{% url 'delete_product' product.id %}">Delete</a>
@@ -268,6 +267,36 @@
 {% else %}
   <p class="no-products">You have no products listed yet.</p>
 {% endif %}
+
+<script>
+  function showStatusMessage(selectElement) {
+    const status = selectElement.value;
+    const messageBox = selectElement.closest('li').querySelector('.status-feedback');
+
+    let message = '';
+    switch (status) {
+      case 'Shipped':
+        message = '✅ You have shipped the order.';
+        break;
+      case 'Delivered':
+        message = '📦 The status of this order is now Delivered.';
+        break;
+      case 'Out for Delivery':
+        message = '🚚 Order is out for delivery.';
+        break;
+      case 'Pending':
+        message = '⏳ Order is pending.';
+        break;
+      default:
+        message = '';
+    }
+
+    if (messageBox) {
+      messageBox.innerText = message + " (" + new Date().toLocaleString() + ")";
+      messageBox.style.display = 'block';
+    }
+  }
+</script>
 
 </body>
 </html>

@@ -1,14 +1,8 @@
-# C:\Users\Deepak\api\ecommerce_website\shop\views\order_views.py
-
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from shop.models import Product, Cart, CartItem, Order
-from shop.forms import CheckoutForm
-# from shop.forms import ShippingForm
-from shop.forms import CheckoutForm, ShippingDetailsForm
-from shop.forms import CheckoutForm, ShippingDetailsForm
-
+from shop.models import Product, Cart, CartItem, Order, Notification
+from shop.forms import ShippingDetailsForm
 
 # -------------------------------
 # View for Order List
@@ -20,15 +14,6 @@ def order_list(request):
     if not orders:
         messages.info(request, "You have no orders yet.")
     return render(request, 'shop/order_list.html', {'orders': orders})
-
-
-# -------------------------------
-# Function to get the latest order status
-# -------------------------------
-def get_latest_order_status(product):
-    latest_order = Order.objects.filter(product=product).order_by('-created_at').first()
-    return latest_order.status if latest_order else "No orders yet"
-
 
 # -------------------------------
 # View for Order Detail
@@ -42,170 +27,17 @@ def order_detail(request, order_id):
         return redirect('order_list')
     return render(request, 'shop/order_detail.html', {'order': order})
 
-
 # -------------------------------
 # Checkout View
 # -------------------------------
-#
-from django.contrib import messages
-from django.shortcuts import render, redirect
-from  shop.forms import ShippingDetailsForm
-from shop.models import Cart, Order
 
-# @login_required
-# def checkout(request):
-#     """
-#     Handle the checkout process by calculating the total price, processing the shipping
-#     details, and creating an order based on the cart items of the logged-in user.
-#     """
-#     # Get the active cart for the logged-in user
-#     cart = Cart.objects.filter(user=request.user, status='active').first()
-
-#     # Ensure the cart exists and is not empty
-#     if not cart or cart.items.count() == 0:
-#         messages.error(request, "Your cart is empty. Please add products to your cart.")
-#         return redirect('cart_detail')
-
-#     # Calculate the total price of the cart
-#     total_price = cart.calculate_total()
-
-#     if request.method == 'POST':
-#         form = ShippingDetailsForm(request.POST, user=request.user)
-#         if form.is_valid():
-#             # Create the order with shipping details
-#             order = Order.objects.create(
-#                 user=request.user,
-#                 shipping_address=form.cleaned_data['shipping_address'],
-#                 total_price=total_price,
-#                 status="Pending"
-#             )
-            
-#             # Add the cart items to the order
-#             for cart_item in cart.items.all():
-#                 order.order_items.create(
-#                     product=cart_item.product,
-#                     quantity=cart_item.quantity,
-#                     price=cart_item.product.price
-#                 )
-            
-#             # Mark the cart as completed
-#             cart.status = 'completed'
-#             cart.save()
-
-#             messages.success(request, "Your order has been successfully confirmed!")
-#             return redirect('order_confirmation', order_id=order.id)
-#     else:
-#         form = ShippingDetailsForm(user=request.user)
-
-#     return render(request, 'shop/checkout.html', {
-#         'form': form,
-#         'cart': cart,
-#         'total_price': total_price,
-#         'order_confirmed': False
-#     })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# from django.contrib.auth.decorators import login_required
-# from django.contrib import messages
-# from shop.models import Cart, Notification, Order
-# from shop.forms import ShippingDetailsForm
-
-# @login_required
-# def checkout(request):
-#     """
-#     Handle the checkout process by calculating the total price, processing the shipping
-#     details, and creating an order based on the cart items of the logged-in user.
-#     """
-#     cart = Cart.objects.filter(user=request.user, status='active').first()
-
-#     if not cart or cart.items.count() == 0:
-#         messages.error(request, "Your cart is empty. Please add products to your cart.")
-#         return redirect('cart_detail')
-
-#     total_price = cart.calculate_total()
-
-#     if request.method == 'POST':
-#         form = ShippingDetailsForm(request.POST, user=request.user)
-#         if form.is_valid():
-#             order = Order.objects.create(
-#                 user=request.user,
-#                 shipping_address=form.cleaned_data['shipping_address'],
-#                 total_price=total_price,
-#                 status="Pending"
-#             )
-            
-#             for cart_item in cart.items.all():
-#                 order.order_items.create(
-#                     product=cart_item.product,
-#                     quantity=cart_item.quantity,
-#                     price=cart_item.product.price
-#                 )
-
-#                 # ✅ Create notification for the seller
-#                 Notification.objects.create(
-#                     user=cart_item.product.seller,
-#                     message=f"New order placed for your product '{cart_item.product.name}' by {request.user.username}."
-#                 )
-
-#             cart.status = 'completed'
-#             cart.save()
-
-#             messages.success(request, "Your order has been successfully confirmed!")
-#             return redirect('order_confirmation', order_id=order.id)
-#     else:
-#         form = ShippingDetailsForm(user=request.user)
-
-#     return render(request, 'shop/checkout.html', {
-#         'form': form,
-#         'cart': cart,
-#         'total_price': total_price,
-#         'order_confirmed': False
-#     })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from shop.models import Cart, Notification, Order
-from shop.forms import ShippingDetailsForm
-
+# Checkout Logic
 @login_required
 def checkout(request):
-    """
-    Handle the checkout process by calculating the total price, processing the shipping
-    details, and creating an order based on the cart items of the logged-in user.
-    """
     cart = Cart.objects.filter(user=request.user, status='active').first()
 
     if not cart or cart.items.count() == 0:
-        messages.error(request, "Your cart is empty. Please add products to your cart.")
+        messages.error(request, "Your cart is empty.")
         return redirect('cart_detail')
 
     total_price = cart.calculate_total()
@@ -213,35 +45,37 @@ def checkout(request):
     if request.method == 'POST':
         form = ShippingDetailsForm(request.POST, user=request.user)
         if form.is_valid():
-            # Create the order with shipping details
             order = Order.objects.create(
                 user=request.user,
                 shipping_address=form.cleaned_data['shipping_address'],
                 total_price=total_price,
-                status="Processing"  # Change order status to 'Processing' or any other status
+                status="Processing"
             )
-            
-            # Add the cart items to the order
+
             for cart_item in cart.items.all():
-                order.order_items.create(
+                order_item = OrderItem.objects.create(
+                    order=order,
                     product=cart_item.product,
                     quantity=cart_item.quantity,
-                    price=cart_item.product.price
+                    price=cart_item.product.price,
+                    status='Pending'
                 )
 
-                # ✅ Create notification for the seller
                 Notification.objects.create(
-                    seller=cart_item.product.seller,  # Make sure this is the seller field
-                    product=cart_item.product,  # Ensure product is passed correctly
-                    message=f"New order placed for your product '{cart_item.product.name}' by {request.user.username}."
+                    recipient=cart_item.product.seller,
+                    product=cart_item.product,
+                    message=f"New order for '{cart_item.product.name}' by {request.user.username}."
                 )
 
-            # Mark the cart as completed
+            Notification.objects.create(
+                recipient=request.user,
+                message="Your order has been placed successfully."
+            )
+
             cart.status = 'completed'
             cart.save()
 
-            # Notify the user
-            messages.success(request, "Your order has been successfully confirmed!")
+            messages.success(request, "Order placed successfully.")
             return redirect('order_confirmation', order_id=order.id)
     else:
         form = ShippingDetailsForm(user=request.user)
@@ -250,17 +84,7 @@ def checkout(request):
         'form': form,
         'cart': cart,
         'total_price': total_price,
-        'order_confirmed': False
     })
-
-
-
-
-
-
-
-
-
 # -------------------------------
 # Order Confirmation View
 # -------------------------------
@@ -292,3 +116,34 @@ def confirm_order(request):
         )
         messages.success(request, "Order has been successfully placed!")
         return redirect('shop/profile')  # Or your user dashboard/profile view
+from django.shortcuts import redirect, get_object_or_404
+from django.http import HttpResponse
+from shop.models import Product
+from shop.models import Product, Cart, CartItem, Order, Notification, OrderItem
+@login_required
+def update_order_status(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+
+    if request.method == "POST":
+        new_status = request.POST.get('order_status')
+        if new_status:
+            order_items = OrderItem.objects.filter(product=product)
+            for item in order_items:
+                item.status = new_status
+                item.save()
+
+                item.order.status = new_status
+                item.order.save()
+
+                Notification.objects.create(
+                    recipient=item.order.user,
+                    product=product,
+                    message=f"The status of your order for '{product.name}' is now '{new_status}'."
+                )
+
+            product.order_status = new_status
+            product.save()
+            print(f"Updated '{product.name}' to '{new_status}'")
+
+        return redirect('seller_dashboard')
+
