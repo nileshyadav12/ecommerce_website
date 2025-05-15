@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # MyGreatShop Website
 
 ## Overview
@@ -19,3 +20,7 @@ First, clone the repository to your local machine:
 
 ```bash
 git clone https://github.com/nileshyadav12/mygreatshop-website.git
+=======
+# ecommerce_website
+A full-featured eCommerce site built with Django. Supports buyer/seller login, product listings (multi-image), cart, wishlist, checkout, PDF invoices, and real-time notifications. Flipkart-style UI. Powered by Django, SQLite/PostgreSQL, HTML/CSS/JS.
+>>>>>>> 191f30387de5e9b392fdc13e76b570157c64b764
